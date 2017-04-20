@@ -1,0 +1,34 @@
+//@version=3
+//
+// This script plots the values to be used to open long and short positions before news
+// 
+// Version: 0.2
+// Author: Alessandra Bilardi
+//
+// *** You must to run backtests to define the period, news and asset where you can use it ***
+// *** I'm not responsible for this script, so its using is at your own risk and danger!!  ***
+
+strategy("Before News", overlay=true)
+atr_period = input(title="ATR Range", type=integer, defval=7)
+
+longTakeProfit = high + ( atr(atr_period) * 2 )
+longEntry = high
+longStopLoss = hl2 - atr(atr_period)
+longTrailStop = na
+longTrailOffset = na
+shortTakeProfit = low - ( atr(atr_period) * 2 )
+shortEntry = low
+shortStopLoss = hl2 + atr(atr_period)
+shortTrailStop = na
+shortTrailOffset = na
+
+if (close > open)
+    longStopLoss = close + atr(atr_period)
+    shortStopLoss = open - atr(atr_period)
+
+if (open > close)
+    longStopLoss = open + atr(atr_period)
+    shortStopLoss = close - atr(atr_period)
+
+plotbar(longEntry, longTakeProfit, longStopLoss, longEntry, title='L', color = green)
+plotbar(shortEntry, shortStopLoss, shortTakeProfit, shortEntry, title='S', color = red)
