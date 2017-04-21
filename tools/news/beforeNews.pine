@@ -2,7 +2,7 @@
 //
 // This script plots the values to be used to open long and short positions before news
 // 
-// Version: 0.2
+// Version: 1.0
 // Author: Alessandra Bilardi
 //
 // *** You must to run backtests to define the period, news and asset where you can use it ***
@@ -10,25 +10,35 @@
 
 strategy("Before News", overlay=true)
 atr_period = input(title="ATR Range", type=integer, defval=7)
+ratio = input(title="Ratio", type=float, defval=0, minval=0, maxval=78)
+atr_multiple = input(title="Coverage by multiple of ATR", type=integer, defval=2, minval=0, maxval=78)
+entry_position = input(title="Entry position", type=integer, defval=0, minval=-78, maxval=78)
+stop_loss_position = input(title="Stop Loss position", type=integer, defval=0, minval=-78, maxval=78)
+stop_loss_count = input(title="Stop Loss count by hl2 (0) or open/close (1)", type=integer, defval=0, minval=0, maxval=1)
 
-longTakeProfit = high + ( atr(atr_period) * 2 )
-longEntry = high
-longStopLoss = hl2 - atr(atr_period)
-longTrailStop = na
-longTrailOffset = na
-shortTakeProfit = low - ( atr(atr_period) * 2 )
-shortEntry = low
-shortStopLoss = hl2 + atr(atr_period)
-shortTrailStop = na
-shortTrailOffset = na
+t = tickerid(syminfo.prefix, ticker)
+highT = security(t, period, high)
+hl2T = security(t, period, hl2)
+lowT = security(t, period, low)
+openT = security(t, period, open)
+closeT = security(t, period, close)
 
-if (close > open)
-    longStopLoss = close + atr(atr_period)
-    shortStopLoss = open - atr(atr_period)
+longEntry = highT + entry_position
+shortEntry = lowT - entry_position
 
-if (open > close)
-    longStopLoss = open + atr(atr_period)
-    shortStopLoss = close - atr(atr_period)
+longTakeProfit = highT + ( atr(atr_period) * 2 )
+longStopLoss = iff(stop_loss_count > 0, hl2T, iff(open > close, openT, closeT)) - atr(atr_period)
+shortTakeProfit = lowT - ( atr(atr_period) * 2 )
+shortStopLoss = iff(stop_loss_count > 0, hl2T, iff(open > close, closeT, openT)) + atr(atr_period)
 
-plotbar(longEntry, longTakeProfit, longStopLoss, longEntry, title='L', color = green)
-plotbar(shortEntry, shortStopLoss, shortTakeProfit, shortEntry, title='S', color = red)
+ltp = plot(longTakeProfit, color=green)
+le = plot(longEntry, color=gray)
+lsl = plot(longStopLoss, color=red)
+stp = plot(shortTakeProfit, color=blue)
+se = plot(shortEntry, color=gray)
+ssl = plot(shortStopLoss, color=orange)
+
+fill(ltp, le, color=green)
+fill(le, lsl, color=red)
+fill(stp, se, color=blue)
+fill(se, ssl, color=orange)
