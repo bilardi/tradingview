@@ -1,14 +1,14 @@
 //@version=3
 //
-// This script plots the values to be used to open long and short positions before news
+// This script plots the values to be used to open long and short positions after news
 // 
-// Version: 1.2
+// Version: 1.0
 // Author: Alessandra Bilardi
 //
 // *** You must to run backtests to define the period, news and asset where you can use it ***
 // *** I'm not responsible for this script, so its using is at your own risk and danger!!  ***
 
-strategy( "Before News", overlay=true )
+strategy( "After News", overlay=true )
 atr_period = input( title="ATR Range", type=integer, defval=7 )
 take_profit_atr_multiple = input( title="Take Profit + ATR multiple (float)", type=float, defval=2, minval=-16, maxval=16 )
 ratio = input( title="Ratio Take Profit / Stop Loss (float)", type=float, defval=0, minval=-16, maxval=16 )
@@ -25,6 +25,8 @@ hl2T = security( t, period, hl2 )
 lowT = security( t, period, low )
 openT = security( t, period, open )
 closeT = security( t, period, close )
+
+hl2T = iff( hl2T > openT, openT, iff( hl2T < closeT, closeT, hl2T ) )
 
 longEntry = iff( entry_count > 0, highT, openT ) + entry_position + ( atr(atr_period) * entry_atr_multiple )
 shortEntry = iff( entry_count > 0, lowT, closeT ) - entry_position - ( atr(atr_period) * entry_atr_multiple )
