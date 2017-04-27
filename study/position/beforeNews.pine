@@ -8,7 +8,7 @@
 // *** You must to run backtests to define the period, news and asset where you can use it ***
 // *** I'm not responsible for this script, so its using is at your own risk and danger!!  ***
 
-strategy( "Before News", overlay=true )
+study( "Before News", overlay=true )
 atr_period = input( title="ATR Range", type=integer, defval=7 )
 take_profit_atr_multiple = input( title="Take Profit + ATR multiple (float)", type=float, defval=2, minval=-50, maxval=50 )
 ratio = input( title="Ratio Take Profit / Stop Loss (float)", type=float, defval=0, minval=-50, maxval=50 )
