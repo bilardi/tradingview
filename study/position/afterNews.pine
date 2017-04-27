@@ -1,0 +1,49 @@
+//@version=3
+//
+// This script plots the values to be used to open long and short positions after news
+// 
+// Version: 1.0
+// Author: Alessandra Bilardi
+//
+// *** You must to run backtests to define the period, news and asset where you can use it ***
+// *** I'm not responsible for this script, so its using is at your own risk and danger!!  ***
+
+study( "After News", overlay=true )
+atr_period = input( title="ATR Range", type=integer, defval=7 )
+take_profit_atr_multiple = input( title="Take Profit + ATR multiple (float)", type=float, defval=2, minval=-50, maxval=50 )
+ratio = input( title="Ratio Take Profit / Stop Loss (float)", type=float, defval=0, minval=-50, maxval=50 )
+entry_atr_multiple = input( title="Entry + ATR multiple (float)", type=float, defval=0, minval=-50, maxval=50 )
+entry_position = input( title="Entry position", type=integer, defval=0, minval=-100, maxval=100 )
+entry_count = input( title="Entry count by high/low (0) or close (1)", type=integer, defval=1, minval=0, maxval=1 )
+stop_loss_atr_multiple = input( title="Stop Loss + ATR multiple (float)", type=integer, defval=1, minval=-50, maxval=50 )
+stop_loss_position = input( title="Stop Loss position", type=integer, defval=0, minval=-100, maxval=100 )
+stop_loss_count = input( title="Stop Loss count by hl2 (0) or close (1) or hlc3 (2)", type=integer, defval=0, minval=0, maxval=2 )
+
+t = tickerid( syminfo.prefix, ticker )
+highT = security( t, period, high )
+hl2T = security( t, period, iff( hl2 < close, close, hl2 ))
+hlc3T = security( t, period, iff( hlc3 < close, close, hlc3 ))
+lowT = security( t, period, low )
+closeT = security( t, period, close )
+
+entryPosition = iff( entry_count > 0, iff( open > close, lowT, highT), closeT )
+stopLossPosition = iff( stop_loss_count > 0, hl2T, iff( stop_loss_count > 1, hlc3T, closeT ))
+
+longEntry = entryPosition + entry_position + ( atr(atr_period) * entry_atr_multiple )
+shortEntry = entryPosition - entry_position - ( atr(atr_period) * entry_atr_multiple )
+longStopLoss = stopLossPosition - stop_loss_position - ( atr(atr_period) * stop_loss_atr_multiple )
+shortStopLoss = stopLossPosition + stop_loss_position + ( atr(atr_period) * stop_loss_atr_multiple )
+longTakeProfit = longEntry + iff( ratio > 0, (( longEntry - longStopLoss ) * ratio ), ( atr(atr_period) * take_profit_atr_multiple ))
+shortTakeProfit = shortEntry - iff( ratio > 0, (( shortStopLoss - shortEntry ) * ratio ), ( atr(atr_period) * take_profit_atr_multiple ))
+
+ltp = plot(longTakeProfit, color=green)
+le = plot(longEntry, color=gray)
+lsl = plot(longStopLoss, color=red)
+stp = plot(shortTakeProfit, color=blue)
+se = plot(shortEntry, color=gray)
+ssl = plot(shortStopLoss, color=orange)
+
+fill(ltp, le, color=green)
+fill(le, lsl, color=red)
+fill(stp, se, color=blue)
+fill(se, ssl, color=orange)
