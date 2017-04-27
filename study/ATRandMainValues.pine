@@ -1,0 +1,46 @@
+//@version=3
+//
+// This script plots the values of high, low, open, close, hl2, hlc3 and ohlc4, plus ATR
+// 
+// Version: 0.18
+// Author: Alessandra Bilardi
+//
+// *** You must to run backtests to define the period and asset where you can use it ***
+// *** I'm not responsible for this script, so its using is at your own risk and danger!! ***
+
+study( "ATR and Main Values", overlay=true )
+atr_period = input( title="ATR Range", type=integer, defval=7 )
+show_hl = input( title="Show high and low plus ATR", type=integer, defval=1, minval=0, maxval=1 )
+hl_atr_multiple = input( title="high / low + ATR multiple (float)", type=float, defval=1, minval=-50, maxval=50 )
+show_oc = input( title="Show open and close plus ATR", type=integer, defval=1, minval=0, maxval=1 )
+oc_atr_multiple = input( title="open / close + ATR multiple (float)", type=float, defval=1, minval=-50, maxval=50 )
+show_hl2 = input( title="Show hl2", type=integer, defval=0, minval=0, maxval=1 )
+hl2_atr_multiple = input( title="hl2 + ATR multiple (float)", type=float, defval=0, minval=-50, maxval=50 )
+show_hlc3 = input( title="Show hlc3", type=integer, defval=0, minval=0, maxval=1 )
+hlc3_atr_multiple = input( title="hlc3 + ATR multiple (float)", type=float, defval=0, minval=-50, maxval=50 )
+show_ohlc4 = input( title="Show ohlc4", type=integer, defval=1, minval=0, maxval=1 )
+ohlc4_atr_multiple = input( title="ohlc4 + ATR multiple (float)", type=float, defval=1, minval=-50, maxval=50 )
+
+t = tickerid( syminfo.prefix, ticker )
+highPlusATR = security( t, period, high ) + ( atr(atr_period) * hl_atr_multiple )
+lowPlusATR = security( t, period, low ) - ( atr(atr_period) * hl_atr_multiple )
+openPlusATR = security( t, period, open ) + ( iff( open > close, 1, -1 ) * atr(atr_period) * oc_atr_multiple )
+closePlusATR = security( t, period, close ) + ( iff( open > close, -1, 1 ) * atr(atr_period) * oc_atr_multiple )
+hl2T = security( t, period, hl2 )
+hl2PlusATR = hl2T + ( atr(atr_period) * hl2_atr_multiple )
+hl2MinusATR = hl2T - ( atr(atr_period) * hl2_atr_multiple )
+hlc3T = security( t, period, hlc3 )
+hlc3PlusATR = hlc3T + ( atr(atr_period) * hlc3_atr_multiple )
+hlc3MinusATR = hlc3T - ( atr(atr_period) * hlc3_atr_multiple )
+ohlc4T = security( t, period, ohlc4 )
+ohlc4PlusATR = ohlc4T + ( atr(atr_period) * ohlc4_atr_multiple )
+ohlc4MinusATR = ohlc4T - ( atr(atr_period) * ohlc4_atr_multiple )
+
+plot( highPlusATR, color=green, linewidth=2, style=cross )
+plot( iff( open > close, openPlusATR, closePlusATR ), color=blue, linewidth=2, style=cross )
+plot( iff( open > close, closePlusATR, openPlusATR ), color=orange, linewidth=2, style=cross )
+plot( lowPlusATR, color=red, linewidth=2, style=cross )
+hpa = plot( iff( show_hl2 > 0, hl2PlusATR, iff( show_hlc3 > 0, hlc3PlusATR, ohlc4PlusATR )), color=purple)
+plot( iff( show_hl2 > 0, hl2T, iff( show_hlc3 > 0, hlc3T, ohlc4T )), color=gray)
+hma = plot( iff( show_hl2 > 0, hl2MinusATR, iff( show_hlc3 > 0, hlc3MinusATR, ohlc4MinusATR )), color=purple)
+fill(hpa, hma, color=purple)
