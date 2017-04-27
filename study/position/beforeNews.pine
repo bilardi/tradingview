@@ -28,8 +28,8 @@ closeT = security( t, period, close )
 
 longEntry = iff( entry_count > 0, highT, openT ) + entry_position + ( atr(atr_period) * entry_atr_multiple )
 shortEntry = iff( entry_count > 0, lowT, closeT ) - entry_position - ( atr(atr_period) * entry_atr_multiple )
-longStopLoss = iff( stop_loss_count > 0, hl2T, iff(open > close, openT, closeT )) - ( atr(atr_period) * stop_loss_atr_multiple )
-shortStopLoss = iff( stop_loss_count > 0, hl2T, iff(open > close, closeT, openT )) + ( atr(atr_period) * stop_loss_atr_multiple )
+longStopLoss = iff( stop_loss_count > 0, hl2T, iff(open > close, openT, closeT )) - stop_loss_position - ( atr(atr_period) * stop_loss_atr_multiple )
+shortStopLoss = iff( stop_loss_count > 0, hl2T, iff(open > close, closeT, openT )) + stop_loss_position + ( atr(atr_period) * stop_loss_atr_multiple )
 longTakeProfit = longEntry + iff( ratio > 0, (( longEntry - longStopLoss ) * ratio ), ( atr(atr_period) * take_profit_atr_multiple ))
 shortTakeProfit = shortEntry - iff( ratio > 0, (( shortStopLoss - shortEntry ) * ratio ), ( atr(atr_period) * take_profit_atr_multiple ))
 
