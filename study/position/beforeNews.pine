@@ -2,7 +2,7 @@
 //
 // This script plots the values to be used to open long and short positions before news
 // 
-// Version: 1.0
+// Version: 1.6
 // Author: Alessandra Bilardi
 //
 // *** You must to run backtests to define the period, news and asset where you can use it ***
