@@ -24,6 +24,13 @@ If you want to use it in your account,
 - click on the **Save** button, to save the script
 - click on the **Add to Chart** button, to show the study / strategy in your chart
 
+## Reference
+
+- [TradingView.com/blog/pine](https://www.tradingview.com/blog/en/?s=pine)
+- [Pine in nuts](https://www.tradingview.com/pine-script-reference/v4/)
+- [Pine Manual](https://www.tradingview.com/pine-script-docs/en/v4/index.html)
+- [Pinescript on Github](https://github.com/topics/pinescript)
+
 ## License
 
 This package is released under the MIT license.  See [LICENSE](LICENSE) for details.
